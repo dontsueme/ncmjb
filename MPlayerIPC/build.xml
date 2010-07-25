@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<project name="ncmjb" default="dist" basedir=".">
+    <description>
+    	ncmjb build file
+    </description>
+	<property name="src" location="src" />
+	<property name="build" location="bin" />
+	<property name="dist" location="dist" />
+	
+	<target name="init">
+		<mkdir dir="${build}"/>			
+	</target>
+	
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${build}" />
+		<copy todir="${build}/" file="${src}/mplayer"/>
+		<copy todir="${build}/" file="${src}/libMPlayerSharedMemory.so"/>
+	</target>
+	
+	<target name="dist" depends="compile">
+		<mkdir dir="${dist}" />
+		<jar jarfile="${dist}/ncmjb.jar" basedir="${build}">
+			<manifest>
+				<attribute name="Main-Class" value="mplayeripc.demo.SimplePlayerUI" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+	</target>
+</project>
