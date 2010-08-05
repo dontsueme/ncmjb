@@ -262,6 +262,9 @@ public class SimplePlayerUI extends JFrame implements WindowListener, ActionList
 		System.out.println(System.getProperty("java.version"));
 		System.out.println(System.getProperty("java.library.path"));
 		System.out.println(System.getProperty("java.vendor"));
+		System.out.println(System.getProperty("os.name"));
+		System.out.println(System.getProperty("os.arch"));
+		System.out.println(System.getProperty("os.version"));
 		
 		UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel"); 
 		//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

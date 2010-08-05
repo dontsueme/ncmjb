@@ -32,7 +32,6 @@
 #include "subopt-helper.h"
 #include "config.h"
 #include "mp_msg.h"
-#include "help_mp.h"
 #include "video_out.h"
 #include "video_out_internal.h"
 
@@ -134,7 +133,8 @@ static int preinit(const char *arg) {
 	{ NULL } };
 
 	if (subopt_parse(arg, subopts) != 0) {
-		mp_msg(MSGT_VO, MSGL_WARN, MSGTR_LIBVO_TGA_UnknownSubdevice, arg);
+		//mp_msg(MSGT_VO, MSGL_WARN, MSGTR_LIBVO_TGA_UnknownSubdevice, arg);
+		mp_tmsg(MSGT_VO,MSGL_WARN, "[VO_TGA] Unknown subdevice: %s.\n",arg);
 		return ENOSYS;
 	}
 

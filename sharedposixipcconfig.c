@@ -37,7 +37,7 @@
 
 #define SHM_SETTING "/ncmjb_shm_setting_"
 #define SEM_DOSETTING "/ncmjb_dosetting_"
-#define SEM_SETTINGFINISHED "/ncmjb_settingfinished_"
+#define SEM_SETTINGFINISHED "/ncmjb_settingfin_"
 
 #define IDSIZE 11 // idsize +1
 #define IDFORMATSTRING "%010d"
@@ -161,14 +161,34 @@ int createShm(void **shmptr, char *shmname, int shmsize, int shmopenflags, char 
 
 	if (shmopenflags & O_CREAT) {
 		if (ftruncate(fd, shmsize) == -1) {
-			shm_unlink(shmname);
-			printf("Error ftruncate: %d %s\n", shmsize, strerror(errno));
-			sprintf(error, "Error ftruncate: %d %s\n", shmsize, strerror(errno));
-			return -1;
+			// for mac we have to try to recreate shm
+			int ret = 0;
+			if (error[0] == '\0') {
+				sprintf(error, "Error ftruncate: %d %s\n", shmsize, strerror(errno));
+				shm_unlink(shmname);
+				ret = createShm(shmptr, shmname, shmsize, shmopenflags, error);
+			} else { // if recreate fails, print errormessages	
+				printf("Error ftruncate 2nd try: %d %s\n", shmsize, strerror(errno));		
+				printf("%s\n", error);
+				shm_unlink(shmname);
+				return -1;
+			}
+					
+			// if successfully recreated, reset errormessage
+			if (ret == 0) {
+				error[0] = '\0';
+			}
+
+			return ret;
 		}
 	}
 
-	*shmptr = mmap(0, shmsize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	int mflags = MAP_SHARED;
+#ifdef __linux__
+	mflags = mflags | MAP_32BIT;
+#endif
+
+	*shmptr = mmap(0, shmsize, PROT_READ | PROT_WRITE, mflags, fd, 0);
 
 	if (*shmptr == NULL) {
 		shm_unlink(shmname);

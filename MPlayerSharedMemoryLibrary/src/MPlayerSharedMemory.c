@@ -20,7 +20,7 @@
 #include "mplayeripc_MPlayerSharedMemory.h"
 
 void stop(jlong ptr) {
-	struct sharedmplayer *smp = (struct sharedmplayer*)((int)ptr);
+	struct sharedmplayer *smp = (struct sharedmplayer*)(ptr);
 	smp->run = 0;
 	uinitipcdata(smp);
 	uinitipcsetting(smp);
@@ -61,12 +61,12 @@ JNIEXPORT jlong JNICALL Java_mplayeripc_MPlayerSharedMemory_init
 		return -1;
 	}
 
-	return (jlong)((int)smp);
+	return (jlong)(smp);
 }
 
 JNIEXPORT void JNICALL Java_mplayeripc_MPlayerSharedMemory_start(JNIEnv *env, jobject jobj, jlong ptr) {
 
-	struct sharedmplayer *smp = (struct sharedmplayer*)((int)ptr);
+	struct sharedmplayer *smp = (struct sharedmplayer*)(ptr);
 
 	jclass cls = (*env)->GetObjectClass(env, jobj);
 	jmethodID mid = (*env)->GetMethodID(env, cls, "updateFromJNI", "(D)V");
@@ -99,14 +99,14 @@ JNIEXPORT void JNICALL Java_mplayeripc_MPlayerSharedMemory_stop(JNIEnv *env, job
 JNIEXPORT jobject JNICALL Java_mplayeripc_MPlayerSharedMemory_getNativeByteBuffer
   (JNIEnv *env, jobject jobj, jint index, jlong ptr) {
 
-	struct sharedmplayer *smp = (struct sharedmplayer*)((int)ptr);
+	struct sharedmplayer *smp = (struct sharedmplayer*)(ptr);
 	return (*env)->NewDirectByteBuffer(env, smp->sharedindex[index], smp->bufferlen);
 }
 
 JNIEXPORT jint JNICALL Java_mplayeripc_MPlayerSharedMemory_startShmSettingDeamon
   (JNIEnv * env, jobject jobj, jlong ptr) {
 
-	struct sharedmplayer *smp = (struct sharedmplayer*)((int)ptr);
+	struct sharedmplayer *smp = (struct sharedmplayer*)(ptr);
 
 	jclass cls = (*env)->GetObjectClass(env, jobj);
 	jmethodID mid = (*env)->GetMethodID(env, cls, "setVideoWidthHeightFromJNI", "(IIII)V");
