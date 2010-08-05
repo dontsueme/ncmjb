@@ -1,0 +1,6 @@
+change in libass/libass.pc.in
+'Libs: -L${libdir} -lass' to 'Libs: -L${libdir} -lass -lfreetype'
+
+unset CFLAGS; unset CXXFLAGS; unset CHOST;
+CFLAGS for libass: 
+export CFLAGS='-march=i686 -mtune=generic'
