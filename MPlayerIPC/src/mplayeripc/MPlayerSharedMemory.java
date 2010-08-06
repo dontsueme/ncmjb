@@ -54,7 +54,7 @@ public abstract class MPlayerSharedMemory implements Runnable {
 	
 	private enum OS {		
 		
-		linux("libMPlayerSharedMemory.so"), mac("libMPlayerSharedMemory.dylib"), windows("MPlayerSharedMemroy.dll"), other("");
+		linux("libMPlayerSharedMemory.so"), mac("libMPlayerSharedMemory.dylib"), windows("MPlayerSharedMemory.dll"), other("");
 		
 		private final String libname;	
 		private final static OS os;
