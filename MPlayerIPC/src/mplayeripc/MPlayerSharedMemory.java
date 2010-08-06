@@ -29,6 +29,8 @@ import mplayeripc.MPlayerException.Cause;
 
 public abstract class MPlayerSharedMemory implements Runnable {
 	
+	private final static String libname = "MPlayerSharedMemory";
+	
 	private static File loadRessource(String respath, String resname) {
 		File ressource;
 		try {	
@@ -54,9 +56,9 @@ public abstract class MPlayerSharedMemory implements Runnable {
 	
 	private enum OS {		
 		
-		linux("libMPlayerSharedMemory.so"), mac("libMPlayerSharedMemory.dylib"), windows("MPlayerSharedMemory.dll"), other("");
+		linux("lib"+libname+".so"), mac("lib"+libname+".dylib"), windows(libname+".dll"), other("");
 		
-		private final String libname;	
+		private final String oslibname;	
 		private final static OS os;
 		
 		static {
@@ -76,11 +78,11 @@ public abstract class MPlayerSharedMemory implements Runnable {
 		}
 		
 		OS(String str) {
-			libname = str;
+			oslibname = str;
 		}
 		
 		public String getLibName() {
-			return libname;
+			return oslibname;
 		}	
 		
 		public String getMPlayerName() {
@@ -115,7 +117,7 @@ public abstract class MPlayerSharedMemory implements Runnable {
 		} catch (Exception e) {
 			//e.printStackTrace();
 			System.out.println("Ressource " + getSharedLibRessourceLocation() + OS.getOS().getLibName() + " not found. Try to find it on the system.");
-			System.loadLibrary("MPlayerSharedMemory");
+			System.loadLibrary(libname);
 		}	    
 	}
 	
