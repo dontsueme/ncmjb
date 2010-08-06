@@ -29,11 +29,12 @@ import mplayeripc.MPlayerException.Cause;
 
 public abstract class MPlayerSharedMemory implements Runnable {
 	
-	private static File loadRessource(String res) {
+	private static File loadRessource(String respath, String resname) {
 		File ressource;
-		try {
-			InputStream is = MPlayerSharedMemory.class.getResourceAsStream("/"+res);
-			ressource = File.createTempFile(res, "");
+		try {	
+			System.out.println("/" + respath + resname);
+			InputStream is = MPlayerSharedMemory.class.getResourceAsStream("/"+respath + resname);
+			ressource = File.createTempFile(resname, "");
 			FileOutputStream fos = new FileOutputStream(ressource);
 			byte[] array = new byte[1024];
 			for(int i=is.read(array); i!=-1; i=is.read(array))
@@ -41,13 +42,60 @@ public abstract class MPlayerSharedMemory implements Runnable {
 			fos.close();
 			is.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 		return ressource;
 	}
 	
+	private static boolean isOS(OS os) {
+		final String osname = System.getProperty("os.name");	
+		if (osname.toLowerCase().contains(os.toString())) {
+			return true;
+		}
+		return false;		
+	}
+	
+	private static OS getOS() {
+		return isOS(OS.linux)?OS.linux:(isOS(OS.mac)?OS.mac:(isOS(OS.windows)?OS.windows:OS.other));
+	}
+	
+	private static boolean is64bitVM() {
+		final String arch = System.getProperty("os.arch");
+		if (arch.contains("64")){
+			return true;
+		}
+		return false;
+	}
+	
+	private enum OS {
+		linux("libMPlayerSharedMemory.so"), mac("libMPlayerSharedMemory.dylib"), windows("MPlayerSharedMemroy.dll"), other("");
+		private String libname;		
+		OS(String str) {
+			libname = str;
+		}
+		public String getLibName() {
+			return libname;
+		}		
+		public String getMPlayerName() {
+			return this.equals(OS.windows)?"mplayer.exe":"mplayer";
+		}
+	}
+	
+	private static String getMPlayerRessourceLocation() {
+		return "binaries/" + getOS() + "/";
+	}
+	
+	private static String getSharedLibRessourceLocation() {
+		final OS os = getOS();
+		String loc = "binaries/" + os + "/";
+		if (!os.equals(OS.mac))
+			loc += is64bitVM() ? "amd64/" : "x86/";	
+		return loc;
+	}
+	
 	public static File loadMplayer() {
-		File mplayer = loadRessource("mplayer");			
+		final File mplayer = loadRessource(getMPlayerRessourceLocation(), getOS().getMPlayerName());			
 		if (mplayer != null)
 			mplayer.setExecutable(true);
 		return mplayer;
@@ -55,12 +103,12 @@ public abstract class MPlayerSharedMemory implements Runnable {
 	
 	static {
 		try {
-			File library = loadRessource("libMPlayerSharedMemory.so");
+			File library = loadRessource(getSharedLibRessourceLocation(), getOS().getLibName());
 			System.load(library.getAbsolutePath());
 			library.delete();
 		} catch (Exception e) {
 			//e.printStackTrace();
-			System.out.println("Ressource libMPlayerSharedMemory.so not found. Try to find it on the system.");
+			System.out.println("Ressource " + getSharedLibRessourceLocation() + getOS().getLibName() + " not found. Try to find it on the system.");
 			System.loadLibrary("MPlayerSharedMemory");
 		}	    
 	}

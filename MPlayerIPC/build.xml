@@ -13,8 +13,9 @@
 	
 	<target name="compile" depends="init">
 		<javac srcdir="${src}" destdir="${build}" />
-		<copy todir="${build}/" file="${src}/mplayer"/>
-		<copy todir="${build}/" file="${src}/libMPlayerSharedMemory.so"/>
+		<copy todir="${build}/binaries">
+			<fileset dir="${src}/binaries"/>
+		</copy>
 	</target>
 	
 	<target name="dist" depends="compile">
