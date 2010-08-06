@@ -21,6 +21,8 @@ package mplayeripc;
 import java.io.File;
 import java.util.HashMap;
 
+import mplayeripc.MPlayerSharedMemory.OS;
+
 public class MPlayerControl implements MPlayerProcessListener {	
 	
 	//TODO: write junit-tests and comment it
@@ -69,7 +71,15 @@ public class MPlayerControl implements MPlayerProcessListener {
 			args.put("-vf", "expand=osd=1");
 		}
 		
-		if (!args.containsKey("-ao")) args.put("-ao", "pulse");
+		if (!args.containsKey("-ao")) { 
+			OS os = MPlayerSharedMemory.OS.getOS();
+			if (os.equals(OS.linux))
+				args.put("-ao", "pulse");
+			else if (os.equals(OS.mac))
+				args.put("-ao", "coreaudio");
+			else if (os.equals(OS.windows))
+				args.put("-ao", "win32waveout");
+		}
 		
 		if (!args.containsKey("-subfont-autoscale")) args.put("-subfont-autoscale", "1");
 		if (!args.containsKey("-noass")) args.put("-ass", null);

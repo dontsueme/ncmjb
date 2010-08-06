@@ -54,7 +54,7 @@ public abstract class MPlayerSharedMemory implements Runnable {
 		return System.getProperty("os.arch").contains("64");
 	}
 	
-	private enum OS {		
+	public enum OS {		
 		
 		linux("lib"+libname+".so"), mac("lib"+libname+".dylib"), windows(libname+".dll"), other("");
 		
