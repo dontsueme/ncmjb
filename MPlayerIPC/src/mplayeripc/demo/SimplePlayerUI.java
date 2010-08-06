@@ -270,7 +270,7 @@ public class SimplePlayerUI extends JFrame implements WindowListener, ActionList
 		//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		
 		
-		File mplayer = MPlayerSharedMemory.loadMplayer();
+		File mplayer = MPlayerSharedMemory.loadMPlayer();
 		
 		final MPlayerBufferedImage mbi = new MPlayerBufferedImage(BufferMode.Double);
 

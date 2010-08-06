@@ -33,10 +33,10 @@ public abstract class MPlayerSharedMemory implements Runnable {
 		File ressource;
 		try {	
 			System.out.println("/" + respath + resname);
-			InputStream is = MPlayerSharedMemory.class.getResourceAsStream("/"+respath + resname);
+			final InputStream is = MPlayerSharedMemory.class.getResourceAsStream("/"+respath + resname);
 			ressource = File.createTempFile(resname, "");
-			FileOutputStream fos = new FileOutputStream(ressource);
-			byte[] array = new byte[1024];
+			final FileOutputStream fos = new FileOutputStream(ressource);
+			final byte[] array = new byte[1024];
 			for(int i=is.read(array); i!=-1; i=is.read(array))
 				fos.write(array, 0, i);
 			fos.close();
@@ -46,56 +46,62 @@ public abstract class MPlayerSharedMemory implements Runnable {
 			return null;
 		}
 		return ressource;
-	}
-	
-	private static boolean isOS(OS os) {
-		final String osname = System.getProperty("os.name");	
-		if (osname.toLowerCase().contains(os.toString())) {
-			return true;
-		}
-		return false;		
-	}
-	
-	private static OS getOS() {
-		return isOS(OS.linux)?OS.linux:(isOS(OS.mac)?OS.mac:(isOS(OS.windows)?OS.windows:OS.other));
-	}
+	}	
 	
 	private static boolean is64bitVM() {
-		final String arch = System.getProperty("os.arch");
-		if (arch.contains("64")){
-			return true;
-		}
-		return false;
+		return System.getProperty("os.arch").contains("64");
 	}
 	
-	private enum OS {
+	private enum OS {		
+		
 		linux("libMPlayerSharedMemory.so"), mac("libMPlayerSharedMemory.dylib"), windows("MPlayerSharedMemroy.dll"), other("");
-		private String libname;		
+		
+		private final String libname;	
+		private final static OS os;
+		
+		static {
+			os = isOS(OS.linux)?OS.linux:(isOS(OS.mac)?OS.mac:(isOS(OS.windows)?OS.windows:OS.other));
+		}
+		
+		private static boolean isOS(OS os) {
+			final String osname = System.getProperty("os.name");	
+			if (osname.toLowerCase().contains(os.toString())) {
+				return true;
+			}
+			return false;		
+		}
+		
+		public static OS getOS() {
+			return os;
+		}
+		
 		OS(String str) {
 			libname = str;
 		}
+		
 		public String getLibName() {
 			return libname;
-		}		
+		}	
+		
 		public String getMPlayerName() {
 			return this.equals(OS.windows)?"mplayer.exe":"mplayer";
-		}
+		}				
 	}
 	
 	private static String getMPlayerRessourceLocation() {
-		return "binaries/" + getOS() + "/";
+		return "binaries/" + OS.getOS() + "/";
 	}
 	
 	private static String getSharedLibRessourceLocation() {
-		final OS os = getOS();
+		final OS os = OS.getOS();
 		String loc = "binaries/" + os + "/";
 		if (!os.equals(OS.mac))
 			loc += is64bitVM() ? "amd64/" : "x86/";	
 		return loc;
 	}
 	
-	public static File loadMplayer() {
-		final File mplayer = loadRessource(getMPlayerRessourceLocation(), getOS().getMPlayerName());			
+	public static File loadMPlayer() {
+		final File mplayer = loadRessource(getMPlayerRessourceLocation(), OS.getOS().getMPlayerName());			
 		if (mplayer != null)
 			mplayer.setExecutable(true);
 		return mplayer;
@@ -103,12 +109,12 @@ public abstract class MPlayerSharedMemory implements Runnable {
 	
 	static {
 		try {
-			File library = loadRessource(getSharedLibRessourceLocation(), getOS().getLibName());
+			final File library = loadRessource(getSharedLibRessourceLocation(), OS.getOS().getLibName());
 			System.load(library.getAbsolutePath());
 			library.delete();
 		} catch (Exception e) {
 			//e.printStackTrace();
-			System.out.println("Ressource " + getSharedLibRessourceLocation() + getOS().getLibName() + " not found. Try to find it on the system.");
+			System.out.println("Ressource " + getSharedLibRessourceLocation() + OS.getOS().getLibName() + " not found. Try to find it on the system.");
 			System.loadLibrary("MPlayerSharedMemory");
 		}	    
 	}
